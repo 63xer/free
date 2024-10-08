@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover">
   <title>My LIFF App</title>
   <style>
-    body { padding: 256px }
-    button { display: none; width: 50%; padding: 16px 0; margin: 16px auto }
+    body { padding: 32px; font-family: Arial, sans-serif; text-align: center; }
+    button { display: none; width: 50%; padding: 16px; margin: 16px auto; }
   </style>
 </head>
 <body>
   <button id="btnShare" onclick="sendShare()">Share Target Picker</button>
   <button id="btnLogin" onclick="liff.login()">Log In</button>
   <button id="btnLogOut" onclick="logOut()">Log Out</button>
+
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function sendShare() {
-      const result = await liff.shareTargetPicker([
-        {
+      try {
+        const result = await liff.shareTargetPicker([{
           "type": "flex",
           "altText": "Flex Message",
           "contents": {
@@ -114,39 +115,36 @@
               ]
             }
           }
-        }
-      ])
-      if (result) {
-        alert(`[${result.status}] Message sent!`)
-      } else {
-        const [majorVer, minorVer, patchVer] = (liff.getLineVersion() || "").split('.');
+        }]);
 
-        if (minorVer === undefined) {
-          alert('ShareTargetPicker was canceled in external browser')
-          return
+        if (result) {
+          alert(`[${result.status}] Message sent!`);
+        } else {
+          alert('ShareTargetPicker was canceled.');
         }
-
-        if (parseInt(majorVer) >= 10 && parseInt(minorVer) >= 10 && parseInt(patchVer) > 0) {
-          alert('ShareTargetPicker was canceled in LINE app')
-        }
+      } catch (error) {
+        console.error(error);
+        alert('An error occurred while sharing.');
       }
     }
+
     function logOut() {
-      liff.logout()
-      window.location.reload()
+      liff.logout();
+      window.location.reload();
     }
+
     async function main() {
-      await liff.init({ liffId: "YOUR-LIFF-ID" })
+      await liff.init({ liffId: "YOUR-LIFF-ID" }); // Replace with your actual LIFF ID
       if (liff.isLoggedIn()) {
-        document.getElementById("btnShare").style.display = "block"
+        document.getElementById("btnShare").style.display = "block";
         if (!liff.isInClient()) {
-          document.getElementById("btnLogOut").style.display = "block"
+          document.getElementById("btnLogOut").style.display = "block";
         }
       } else {
-        document.getElementById("btnLogin").style.display = "block"
+        document.getElementById("btnLogin").style.display = "block";
       }
     }
-    main()
+    main();
   </script>
 </body>
 </html>
